@@ -13,15 +13,8 @@ const recipes = [
 const recipeData = {} // You can access all of the Recipe Data from the JSON files in this variable
 
 const router = new Router(function () {
-  /** 
-   * TODO - Part 1
-   * fill in the function to display the home page.
-   * This should be straight forward, functions here should be swapping around the "shown" class only,
-   * which was given to you in the CSS. Simply add / remove this class to the corresponding <section> 
-   * elements to display / hide that section. Everything is hidden by default. Make sure that you 
-   * are removing any "shown" classes on <sections> you don't want to display, this home method should
-   * be called more than just at the start. You should only really need two lines for this function.
-   */
+  document.querySelector('.section--recipe-cards').classList.add('shown');
+  document.querySelector('.section--recipe-expand').classList.remove('shown');
 });
 
 window.addEventListener('DOMContentLoaded', init);
@@ -45,9 +38,8 @@ async function init() {
   // Everything starts hidden so load the initial page.
   // This allows the page to be reloaded and maintain the current page, as well
   // as minimizes the amount of "page flashing" from the home --> new page
-  let page = window.location.hash.slice(1);
-  if (page == '') page = 'home';
-  router.navigate(page);
+  let page = window.location.hash.slice(1) || 'home';
+  router.navigate(page, true);
 }
 
 /**
@@ -95,20 +87,16 @@ function createRecipeCards() {
   for (let i = 0; i < recipes.length; i++) {
     const recipeCard = document.createElement('recipe-card');
     recipeCard.data = recipeData[recipes[i]];
-    /**
-     * TODO - Part 1
-     * Create the new routes for each card with .addPage(), use bindRecipeCard()
-     * to bind the 'click' event (and resulting actions) to said card.
-     * We've given you an extra variable on each recipeCard so you don't have to create
-     * a neat page name - it's accessible right here with recipeData[recipes[i]]['page-name'],
-     * it's the filename of the .json without the .json part.
-     * 
-     * Also you can set the <recipe-expand> element's data the same way as a <recipe-card>,
-     * using .data - feel free to peek in the RecipeExpand.js file for more info.
-     * 
-     * Again - the functions here should be swapping around the "shown" class only, simply
-     * add this class to the correct <section> to display that section
-     */
+
+    const pageName = recipeData[recipes[i]]['page-name'];
+    router.addPage(pageName, function () {
+      const recipeExpand = document.querySelector('.section--recipe-expand > recipe-expand');
+      recipeExpand.data = recipeData[recipes[i]];
+      document.querySelector('.section--recipe-expand').classList.add('shown');
+      document.querySelector('.section--recipe-cards').classList.remove('shown');
+    });
+    bindRecipeCard(recipeCard, pageName);
+
     if (i >= 3) recipeCard.classList.add('hidden');
     document.querySelector('.recipe-cards--wrapper').appendChild(recipeCard);
   }
@@ -150,10 +138,9 @@ function bindShowMore() {
  * @param {String} pageName the name of the page to navigate to on click
  */
 function bindRecipeCard(recipeCard, pageName) {
-  /**
-   * TODO - Part 1
-   * Fill in this function as specified in the comment above
-   */
+  recipeCard.addEventListener('click', function () {
+    router.navigate(pageName, false);
+  });
 }
 
 /**
@@ -161,10 +148,11 @@ function bindRecipeCard(recipeCard, pageName) {
  * it is clicked, the home page is returned to
  */
 function bindEscKey() {
-  /**
-   * TODO - Part 1
-   * Fill in this function as specified in the comment above
-   */
+  document.addEventListener('keydown', (e) => {
+    if (e.key == 'Escape') {
+      router.navigate('home', false);
+    }
+  });
 }
 
 /**
@@ -175,8 +163,7 @@ function bindEscKey() {
  * info in your popstate function)
  */
 function bindPopstate() {
-  /**
-   * TODO - Part 1
-   * Fill in this function as specified in the comment above
-   */
+  window.addEventListener('popstate', (e) => {
+    router.navigate(e.state, true);
+  });
 }

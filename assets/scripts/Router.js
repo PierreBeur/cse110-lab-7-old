@@ -20,10 +20,7 @@ export class Router {
    *                            visually
    */
   constructor(homeFunc) {
-    /**
-     * TODO Part 1
-     * Fill in this function as specified in the comment above
-     */
+    this.pages = {'home': {hash: '', func: homeFunc}};
   }
 
   /**
@@ -34,10 +31,7 @@ export class Router {
    * @param {Function} pageFunc The function to run when the page is called
    */
   addPage(page, pageFunc) {
-    /**
-     * TODO Part 1
-     * Fill in this function as specified in the comment above
-     */
+    this.pages[page] = {hash: `#${page}`, func: pageFunc};
   }
 
   /**
@@ -48,9 +42,12 @@ export class Router {
    *                              'popstate' event instead of a normal card click
    */
   navigate(page, statePopped) {
-    /**
-     * TODO Part 1
-     * Fill in this function as specified in the comment above
-     */
+    const url = `${window.location.origin}/${this.pages[page].hash}`;
+    if (statePopped) {
+      history.replaceState(page, '', url);
+    } else {
+      history.pushState(page, '', url);
+    }
+    this.pages[page].func();
   }
 }
