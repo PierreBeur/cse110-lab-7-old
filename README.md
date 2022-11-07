@@ -1,1 +1,3 @@
-# Lab 7 - Starter Code
+# Lab 7
+
+Charles-Pierre Beurtheret
